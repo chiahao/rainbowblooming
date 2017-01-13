@@ -14,6 +14,7 @@
 		<script type="text/javascript" src="//cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
 		<script type="text/javascript" src="js/codebase/ext/dhtmlxgantt_fullscreen.js"></script>
 		<script type="text/javascript" src="js/codebase/ext/dhtmlxgantt_marker.js"></script>
+		<script type="text/javascript" src="js/codebase/ext/dhtmlxgantt_tooltip.js"></script>
 		<!--TW-->
 		<script type="text/javascript" src="js/codebase/locale/locale_tw.js" charset="utf-8"></script>
 		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>-->
@@ -52,6 +53,13 @@
 			//gantt.init("gantt_here", new Date(2016,12,1), new Date(2017,5,31));
 			gantt.config.readonly = true;
 			gantt.init("gantt_here");
+			var markerId = gantt.addMarker({  
+                start_date: new Date(), 
+                css: "today", 
+                text: "Now" 
+                //,title:date_to_str( new Date()) 
+            });
+            gantt.getMarker(markerId);
 			
 //			var mySpreadsheet = 'https://docs.google.com/spreadsheets/d/1gwwBWiMjIzeEv0DTVMJYpEZyRU188Cu7vxX9jFAAWdw/edit#gid=0';
 //			$('#switch-hitters').sheetrock({
@@ -143,18 +151,39 @@ https://docs.google.com/spreadsheets/d/1MDpCz3HaEXO_-g50KqN3cuMRWZOBv3p5TEXPjWs7
               Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/1gwwBWiMjIzeEv0DTVMJYpEZyRU188Cu7vxX9jFAAWdw/pubhtml',
                                callback: function(data, tabletop) { 
                                    //console.log(data);
-                                   loadGantt(data);
+                                   loadGanttData(data);
                                },
                                simpleSheet: true } )
             }
+            // 開始載入資料
             window.addEventListener('DOMContentLoaded', init);
 
-            // 載入至 gantt chart
-            function loadGantt(data){
-                var tasks = {};
-                var tasks = JSON.parse('{"data":""}');
+            // 載入連結資料
+            function init_link() {
+              Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/1J04Xx_XKflQi6VssS3NKhKr8aJoZHWtkdM09luNBqEc/pubhtml',
+                               callback: function(data, tabletop) { 
+                                   //console.log(data);
+                                   loadGanttLink(data);
+                               },
+                               simpleSheet: true } )
+            }
+
+            var tasks = JSON.parse('{"data":"", "links":""}');
+
+            function loadGanttData(data){
                 tasks.data=data;
+                init_link();
+            }
+
+            function loadGanttLink(data){
+                tasks.links=data;
+                loadGantt();
+            }
+
+            // 載入至 gantt chart
+            function loadGantt(){
                 gantt.parse(tasks);
+                gantt.getMarker(markerId);
             }
            
             setScaleConfig('2');
@@ -174,3 +203,4 @@ https://docs.google.com/spreadsheets/d/1MDpCz3HaEXO_-g50KqN3cuMRWZOBv3p5TEXPjWs7
 		</script>
 	</body>
 </html>
+
